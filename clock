@@ -1,0 +1,93 @@
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.geom.Arc2D;
+import java.util.Calendar;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+public class klok extends JPanel implements Runnable{
+   int s1;
+   int s2;
+   int m1;
+   int m2;
+   int h1;
+   int h2;
+   Thread t1=new Thread(this);
+public klok(){
+	      this.setDoubleBuffered(true);
+	       t1.start();
+}
+ public static void main(String[] args) {
+	      JFrame f = new JFrame("Analog Clock");
+	      f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	      f.setSize(400, 400);
+	      f.setBackground(Color.cyan);
+	      klok a = new klok();
+	      f.add(a, BorderLayout.CENTER);     
+	      f.setVisible(true);
+	   }
+   public void paint(Graphics g) {
+	   super.paintComponent(g);
+      Graphics2D v = (Graphics2D) g;
+      v.translate(getWidth()/2, getHeight()/2);
+      drawClock(v);
+      drawHands(v);
+   }
+   public void run() {
+      while (true) {
+         try {
+            int s = Calendar.getInstance().get(Calendar.SECOND);
+            s1 = (int) (Math.cos(s*Math.PI/30-Math.PI/2)*80+0);
+            s2 = (int) (Math.sin(s*Math.PI/30-Math.PI/2)*80+0);
+            int m = Calendar.getInstance().get(Calendar.MINUTE);
+            m1 = (int) (Math.cos(m*Math.PI/30-Math.PI/2)*75+0);
+            m2 = (int) (Math.sin(m*Math.PI/30-Math.PI/2)*75+0);
+            int h = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+            h1 = (int) (Math.cos((h*30+m/2)*Math.PI/180-Math.PI/2)*60+0);
+            h2 = (int) (Math.sin((h*30+m/2)*Math.PI/180-Math.PI/2)*60+0);
+            repaint();
+            Thread.sleep(500);
+         } catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+      }
+   }
+   public void drawClock(Graphics2D d) {
+      d.setPaint(Color.white);
+      d.fill(new Arc2D.Double(-110,-110,220,220,0,360,Arc2D.CHORD));
+      d.setColor(Color.black);
+      d.drawString("SaiTeja", -30, -25);
+      d.setStroke(new BasicStroke(4.0f));
+      d.draw(new Arc2D.Double(-110,-110,220,220,0,360,Arc2D.CHORD));
+      for (int i=0;i<60;i++) {
+         if((i%5)!= 0){
+            d.setStroke(new BasicStroke(1.0f));
+            d.setColor(Color.blue);
+            d.drawLine(92,0,96,0);
+         }else {
+            d.setColor(new Color(255,22,10));
+            d.setStroke(new BasicStroke(2.0f));
+            d.drawLine(88,0,96,0);
+         }
+         d.rotate((Math.PI/180.0)*6.0);
+      }
+   }
+
+   public void drawHands(Graphics2D m) {
+      m.setColor(Color.RED);
+      m.setStroke(new BasicStroke(5.0f));
+      m.drawLine(0, 0, h1, h2);
+      m.setStroke(new BasicStroke(3.0f));
+      m.drawLine(0, 0, m1, m2);
+      m.setColor(Color.black);
+      m.setStroke(new BasicStroke(2.0f));
+      m.drawLine(0, 0, s1, s2);
+      m.setColor(Color.blue);
+      m.fillOval(-5, -5, 10, 10);
+      m.setColor(Color.red);
+      m.fillOval(-2, -2, 4, 4);
+   }
+   
+}
